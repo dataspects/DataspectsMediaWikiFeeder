@@ -10,10 +10,20 @@ class DataspectsMediaWikiFeederJob extends \Job {
   }
 
   public function run() {
-    // When the queue picks up this job, then this is the code that will be
-    // executed!
-    var_dump("lex");
-    var_dump($this->getTitle());
+    //var_dump($this->getTitle());
+    $params = new \FauxRequest(
+      array(
+        'action' => 'query',
+        'list' => 'allpages',
+        'apnamespace' => 0,
+        'aplimit' => 10,
+        'apprefix' => 'M'
+      )
+    );
+    $api = new \ApiMain( $params );
+    $api->execute();
+    $data = $api->getResult()->getResultData();
+    var_dump($data);
   }
 
 }
