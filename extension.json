@@ -1,0 +1,46 @@
+{
+	"name": "DataspectsMediaWikiFeeder",
+	"author": [
+		"Lex Sulzer"
+	],
+	"url": "https://www.mediawiki.org/wiki/Extension:DataspectsMediaWikiFeeder",
+	"descriptionmsg": "DataspectsMediaWikiFeeder-desc",
+	"license-name": "GPL-2.0-or-later",
+	"type": "other",
+	"requires": {
+		"MediaWiki": ">= 1.31.0"
+	},
+	"AutoloadNamespaces": {
+		"MediaWiki\\Extension\\DataspectsMediaWikiFeeder\\": "includes/"
+	},
+	"config": {
+		"DataspectsMediaWikiFeederEnableFoo": {
+			"description": "Enable the Foo feature.",
+			"value": true
+		}
+	},
+	"Hooks": {
+		"PageContentSaveComplete": "MediaWiki\\Extension\\DataspectsMediaWikiFeeder\\Hooks::onPageContentSaveComplete"
+	},
+	"MessagesDirs": {
+		"DataspectsMediaWikiFeeder": [
+			"i18n"
+		]
+	},
+	"ResourceFileModulePaths": {
+		"localBasePath": "resources",
+		"remoteExtPath": "DataspectsMediaWikiFeeder/resources"
+	},
+	"ResourceModules": {
+		"ext.DataspectsMediaWikiFeeder": {
+			"dependencies": [],
+			"messages": [],
+			"styles": [],
+			"scripts": []
+		}
+	},
+	"JobClasses": {
+		"DataspectsMediaWikiFeederJob": "MediaWiki\\Extension\\DataspectsMediaWikiFeeder\\DataspectsMediaWikiFeederJob"
+	},
+	"manifest_version": 2
+}
