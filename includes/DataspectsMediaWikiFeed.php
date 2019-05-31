@@ -4,33 +4,59 @@ namespace MediaWiki\Extension\DataspectsMediaWikiFeeder;
 
 class DataspectsMediaWikiFeed {
 
-  public function __construct($title) {
+  public function __construct($title, $namespaceNumber) {
     $this->title = $title;
+    $this->namespaceNumber = $namespaceNumber;
     $this->annotations = array();
     $this->wikiPage = \WikiPage::factory($title);
-    $this->getParsedWikitext();
-    $this->getAnnotations();
+    //FIXME: $title->getNamespace() is always 0, even for Property!
+    switch($this->namespaceNumber) {
+      case 0:
+        $this->getWikitext();
+        $this->getParsedWikitext();
+        $this->getEntityAnnotations();
+        $this->url = $GLOBALS['wgDataspectsApiURL'].'mediawikis/'.$GLOBALS['wgMediaWikiMongoID']."/pages";
+        $this->mongoDoc = $this->entityMongodoc();
+        break;
+      case 10:
+        $this->getWikitext();
+        $this->url = $GLOBALS['wgDataspectsApiURL'].'mediawikis/'.$GLOBALS['wgMediaWikiMongoID']."/pages";
+        $this->mongoDoc = $this->entityMongodoc();
+        break;
+      case 106:
+        $this->getWikitext();
+        $this->url = $GLOBALS['wgDataspectsApiURL'].'mediawikis/'.$GLOBALS['wgMediaWikiMongoID']."/pages";
+        $this->mongoDoc = $this->entityMongodoc();
+        break;
+      case 102:
+        $this->getPredicateAnnotations();
+        $this->url = $GLOBALS['wgDataspectsApiURL'].'predicates';
+        $this->mongoDoc = $this->predicateMongodoc();
+        break;
+      default:
+        die("Error in determining namespace.");
+        break;
+    }
+  }
+
+  private function getWikitext() {
+    $revision = $this->wikiPage->getRevision();
+    if(empty($revision)) {
+      $this->wikitext = '';
+    } else {
+      $content = $revision->getContent( \Revision::RAW );
+      $this->wikitext = \ContentHandler::getContentText( $content );
+    }
   }
 
   private function getParsedWikitext() {
-    $revision = $this->wikiPage->getRevision();
-    $content = $revision->getContent( \Revision::RAW );
-    $this->wikitext = \ContentHandler::getContentText( $content );
     $parser = new \Parser();
     $parserOptions = new \ParserOptions();
     $this->parsedWikitext = $parser->parse($this->wikitext, $this->title, $parserOptions);
   }
 
-  private function getAnnotations() {
-    $params = new \FauxRequest(
-      array(
-        'action' => 'browsebysubject',
-        'subject' => $this->title
-      )
-    );
-    $api = new \ApiMain( $params );
-    $api->execute();
-    $data = $api->getResult()->getResultData();
+  private function getEntityAnnotations() {
+    $data = $this->browseBySubject($this->title);
     foreach($data['query']['data'] as $property) {
       if(is_array($property)) {
         $propertyName = $property['property'];
@@ -53,7 +79,23 @@ class DataspectsMediaWikiFeed {
     }
   }
 
-  private function mongodoc() {
+  private function getPredicateAnnotations() {
+    $data = $this->browseBySubject('Property:'.$this->title);
+    foreach($data['query']['data'] as $property) {
+      if(is_array($property)) {
+        $propertyName = $property['property'];
+        foreach($property['dataitem'] as $object) {
+          if(is_array($object)) {
+            $this->annotations[$propertyName] = array(
+              'object' => $object['item']
+            );
+          }
+        }
+      }
+    }
+  }
+
+  private function entityMongodoc() {
     $mongoDoc = array(
       "slug" => "pending",
       "resourceSiloType" => "pending",
@@ -64,7 +106,7 @@ class DataspectsMediaWikiFeed {
       // Do we want the index.php?title= form here?
       "rawUrl" => $this->title->getInternalURL(),
       "shortUrl" => $this->title->getFullURL(),
-      "namespace" => $this->getNamespace($this->title->getNamespace()),
+      "namespace" => $this->getNamespace($this->namespaceNumber),
       "full" => array(
         "wikitext" => $this->wikitext,
         "text" => "NOT USED BECAUSE NO TIKA HERE",
@@ -80,14 +122,22 @@ class DataspectsMediaWikiFeed {
     return json_encode($mongoDoc);
   }
 
+  private function predicateMongodoc() {
+    $predicateMongodoc = array(
+      "predicate" => $this->title->mTextform,
+      "predicateType" => $this->annotations['_TYPE']['object'],
+      "predicateClass" => $this->annotations['HasPredicateClass']['object'],
+      "predicateNamespace" => "pending"
+    );
+    return json_encode($predicateMongodoc);
+  }
+
   public function sendToMongoDB() {
-    $url = $GLOBALS['wgDataspectsApiURL'].'mediawikis/'.$GLOBALS['wgMediaWikiMongoID']."/pages";
-    // Compile $data into $mongoDoc so that it fits mongodoc!
     $req = \MWHttpRequest::factory(
-      $url,
+      $this->url,
       [
         "method" => "post",
-        "postData" => $this->mongodoc()
+        "postData" => $this->mongoDoc
       ],
       __METHOD__
     );
@@ -111,6 +161,19 @@ class DataspectsMediaWikiFeed {
       $namespace = \MWNamespace::getCanonicalName($index);
     }
     return $namespace;
+  }
+
+  private function browseBySubject($title) {
+    $params = new \FauxRequest(
+      array(
+        'action' => 'browsebysubject',
+        'subject' => $title
+      )
+    );
+    $api = new \ApiMain( $params );
+    $api->execute();
+    $data = $api->getResult()->getResultData();
+    return $data;
   }
 
 }

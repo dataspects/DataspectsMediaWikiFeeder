@@ -20,11 +20,12 @@ class DMFFeedAll extends Maintenance {
     $this->feedNamespace(0); // Mainspace
 		$this->feedNamespace(10); // Template
 		$this->feedNamespace(106); // Form
+		$this->feedNamespace(102); // Property
 	}
 
 	private function feedNamespace($namespaceNumber) {
 		foreach($this->pageTitlesInNamespace($namespaceNumber) as $title) {
-			$dmwf = new \MediaWiki\Extension\DataspectsMediaWikiFeeder\DataspectsMediaWikiFeed($title);
+			$dmwf = new \MediaWiki\Extension\DataspectsMediaWikiFeeder\DataspectsMediaWikiFeed($title, $namespaceNumber);
 			$dmwf->sendToMongoDB();
 		}
 	}
