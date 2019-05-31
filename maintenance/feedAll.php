@@ -13,18 +13,26 @@
 $basePath = getenv( 'MW_INSTALL_PATH' ) !== false ? getenv( 'MW_INSTALL_PATH' ) : __DIR__ . '/../../..';
 require_once $basePath . '/maintenance/Maintenance.php';
 
-class HelloWorld extends Maintenance {
+class DMFFeedAll extends Maintenance {
 
 	public function execute() {
-    // https://www.mediawiki.org/wiki/Manual:Database_access
-    // https://doc.wikimedia.org/mediawiki-core/master/php/classWikimedia_1_1Rdbms_1_1Database.html
-    // https://doc.wikimedia.org/mediawiki-core/master/php/classWikimedia_1_1Rdbms_1_1Database.html#a3b03dd27f434aabfc8d2d639d1e5fa9a
-    foreach($this->pageTitlesInNamespace(0) as $title) {
-			$wikiPage = \WikiPage::factory($title);
+		// api.php?action=query&meta=siteinfo&siprop=namespaces
+    $this->feedNamespace(0); // Mainspace
+		$this->feedNamespace(10); // Template
+		$this->feedNamespace(106); // Form
+	}
+
+	private function feedNamespace($namespaceNumber) {
+		foreach($this->pageTitlesInNamespace($namespaceNumber) as $title) {
+			$dmwf = new \MediaWiki\Extension\DataspectsMediaWikiFeeder\DataspectsMediaWikiFeed($title);
+			$dmwf->sendToMongoDB();
 		}
 	}
 
   private function pageTitlesInNamespace($namespaceNumber) {
+		// https://www.mediawiki.org/wiki/Manual:Database_access
+    // https://doc.wikimedia.org/mediawiki-core/master/php/classWikimedia_1_1Rdbms_1_1Database.html
+    // https://doc.wikimedia.org/mediawiki-core/master/php/classWikimedia_1_1Rdbms_1_1Database.html#a3b03dd27f434aabfc8d2d639d1e5fa9a
     $pageTitles = array();
     $dbr = wfGetDB( DB_REPLICA );
     $res = $dbr->select(
@@ -42,6 +50,6 @@ class HelloWorld extends Maintenance {
 
 }
 
-$maintClass = HelloWorld::class;
+$maintClass = DMFFeedAll::class;
 
 require_once RUN_MAINTENANCE_IF_MAIN;
