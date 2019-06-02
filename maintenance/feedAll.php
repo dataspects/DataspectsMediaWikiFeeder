@@ -23,14 +23,14 @@ class DMFFeedAll extends Maintenance {
 		$this->feedNamespace(102); // Property
 	}
 
-	private function feedNamespace($namespaceNumber) {
+	private function feedNamespace(int $namespaceNumber) {
 		foreach($this->pageTitlesInNamespace($namespaceNumber) as $title) {
-			$dmwf = new \MediaWiki\Extension\DataspectsMediaWikiFeeder\DataspectsMediaWikiFeed($title, $namespaceNumber);
+			$dmwf = new \MediaWiki\Extension\DataspectsMediaWikiFeeder\DataspectsMediaWikiFeed($title);
 			$dmwf->sendToMongoDB();
 		}
 	}
 
-  private function pageTitlesInNamespace($namespaceNumber) {
+  private function pageTitlesInNamespace(int $namespaceNumber) {
 		// https://www.mediawiki.org/wiki/Manual:Database_access
     // https://doc.wikimedia.org/mediawiki-core/master/php/classWikimedia_1_1Rdbms_1_1Database.html
     // https://doc.wikimedia.org/mediawiki-core/master/php/classWikimedia_1_1Rdbms_1_1Database.html#a3b03dd27f434aabfc8d2d639d1e5fa9a
@@ -38,7 +38,7 @@ class DMFFeedAll extends Maintenance {
     $dbr = wfGetDB( DB_REPLICA );
     $res = $dbr->select(
     	'page',                                   // $table The table to query FROM (or array of tables)
-    	array( 'page_title' ),            // $vars (columns of the table to SELECT)
+    	array( 'page_namespace', 'page_title' ),            // $vars (columns of the table to SELECT)
     	'page_namespace = '.$namespaceNumber,                              // $conds (The WHERE conditions)
     	__METHOD__,                                   // $fname The current __METHOD__ (for performance tracking)
     	array()        // $options = array()

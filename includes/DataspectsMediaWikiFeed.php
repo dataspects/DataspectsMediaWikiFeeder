@@ -4,13 +4,11 @@ namespace MediaWiki\Extension\DataspectsMediaWikiFeeder;
 
 class DataspectsMediaWikiFeed {
 
-  public function __construct($title, $namespaceNumber) {
+  public function __construct(\Title $title) {
     $this->title = $title;
-    $this->namespaceNumber = $namespaceNumber;
     $this->annotations = array();
     $this->wikiPage = \WikiPage::factory($title);
-    //FIXME: $title->getNamespace() is always 0, even for Property!
-    switch($this->namespaceNumber) {
+    switch($this->title->mNamespace) {
       case 0:
         $this->getWikitext();
         $this->getParsedWikitext();
@@ -34,7 +32,7 @@ class DataspectsMediaWikiFeed {
         $this->mongoDoc = $this->predicateMongodoc();
         break;
       default:
-        die("Error in determining namespace.");
+        die("ERROR in determining namespace ".$this->title->mNamespace."\n");
         break;
     }
   }
@@ -80,7 +78,7 @@ class DataspectsMediaWikiFeed {
   }
 
   private function getPredicateAnnotations() {
-    $data = $this->browseBySubject('Property:'.$this->title);
+    $data = $this->browseBySubject($this->title);
     foreach($data['query']['data'] as $property) {
       if(is_array($property)) {
         $propertyName = $property['property'];
@@ -106,7 +104,7 @@ class DataspectsMediaWikiFeed {
       // Do we want the index.php?title= form here?
       "rawUrl" => $this->title->getInternalURL(),
       "shortUrl" => $this->title->getFullURL(),
-      "namespace" => $this->getNamespace($this->namespaceNumber),
+      "namespace" => $this->getNamespace($this->title->mNamespace),
       "full" => array(
         "wikitext" => $this->wikitext,
         "text" => "NOT USED BECAUSE NO TIKA HERE",
@@ -127,7 +125,7 @@ class DataspectsMediaWikiFeed {
       "predicate" => $this->title->mTextform,
       "predicateType" => $this->annotations['_TYPE']['object'],
       "predicateClass" => $this->annotations['HasPredicateClass']['object'],
-      "predicateNamespace" => "pending"
+      "predicateNamespace" => $this->getNamespace($this->title->mNamespace)
     );
     return json_encode($predicateMongodoc);
   }
@@ -163,7 +161,7 @@ class DataspectsMediaWikiFeed {
     return $namespace;
   }
 
-  private function browseBySubject($title) {
+  private function browseBySubject(string $title) {
     $params = new \FauxRequest(
       array(
         'action' => 'browsebysubject',
