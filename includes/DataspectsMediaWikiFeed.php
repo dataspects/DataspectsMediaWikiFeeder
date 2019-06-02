@@ -32,7 +32,7 @@ class DataspectsMediaWikiFeed {
         $this->mongoDoc = $this->predicateMongodoc();
         break;
       default:
-        die("ERROR in determining namespace ".$this->title->mNamespace."\n");
+        echo "ERROR in determining namespace ".$this->title->mNamespace."\n";
         break;
     }
   }
