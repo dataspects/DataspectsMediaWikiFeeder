@@ -60,9 +60,9 @@ class DataspectsMediaWikiFeed {
         $propertyName = $property['property'];
         if($propertyName[0] != '_') {
           foreach($property['dataitem'] as $object) {
-            if(is_array($object)) {
+	    if(is_array($object)) {
               $this->annotations[] = array(
-                'subject' => $this->title->prefixedText,
+                'subject' => $this->title->mTextform,
                 'predicate' => $propertyName,
                 'object' => array(
                   'source' => str_replace('#0##', '', $object['item']),
