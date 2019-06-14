@@ -10,6 +10,7 @@ class DataspectsMediaWikiFeed {
     $this->wikiPage = \WikiPage::factory($title);
     switch($this->title->mNamespace) {
       case 0:
+        $this->getCategories();
         $this->getWikitext();
         $this->getParsedWikitext();
         $this->getEntityAnnotations();
@@ -17,16 +18,19 @@ class DataspectsMediaWikiFeed {
         $this->mongoDoc = $this->entityMongodoc();
         break;
       case 10:
+        $this->getCategories();
         $this->getWikitext();
         $this->url = $GLOBALS['wgDataspectsApiURL'].'mediawikis/'.$GLOBALS['wgMediaWikiMongoID']."/pages";
         $this->mongoDoc = $this->entityMongodoc();
         break;
       case 106:
+        $this->getCategories();
         $this->getWikitext();
         $this->url = $GLOBALS['wgDataspectsApiURL'].'mediawikis/'.$GLOBALS['wgMediaWikiMongoID']."/pages";
         $this->mongoDoc = $this->entityMongodoc();
         break;
       case 102:
+        $this->getCategories();
         $this->getPredicateAnnotations();
         $this->url = $GLOBALS['wgDataspectsApiURL'].'predicates';
         $this->mongoDoc = $this->predicateMongodoc();
@@ -34,6 +38,14 @@ class DataspectsMediaWikiFeed {
       default:
         echo "ERROR in determining namespace ".$this->title->mNamespace."\n";
         break;
+    }
+  }
+
+  private function getCategories() {
+    $this->categories = array();
+    $categories = $this->wikiPage->getCategories();
+    foreach($categories as $category) {
+      $this->categories[] = $category->mTextform;
     }
   }
 
@@ -60,7 +72,7 @@ class DataspectsMediaWikiFeed {
         $propertyName = $property['property'];
         if($propertyName[0] != '_') {
           foreach($property['dataitem'] as $object) {
-	    if(is_array($object)) {
+	          if(is_array($object)) {
               $this->annotations[] = array(
                 'subject' => $this->title->mTextform,
                 'predicate' => $propertyName,
@@ -110,10 +122,7 @@ class DataspectsMediaWikiFeed {
         "text" => "NOT USED BECAUSE NO TIKA HERE",
         "html" => $this->parsedWikitext->mText
       ),
-      "nonFormssemanticized" => array(
-        "html" => "pending",
-        "text" => "pending",
-      ),
+      "categories" => $this->categories,
       "annotations" => $this->annotations,
       "feederClass" =>"DataspectsMediaWikiFeeder"
     );
@@ -125,7 +134,8 @@ class DataspectsMediaWikiFeed {
       "predicate" => $this->title->mTextform,
       "predicateType" => $this->annotations['_TYPE']['object'],
       "predicateClass" => $this->annotations['HasPredicateClass']['object'],
-      "predicateNamespace" => $this->getNamespace($this->title->mNamespace)
+      "predicateNamespace" => $this->getNamespace($this->title->mNamespace),
+      "predicateCategories" => $this->categories
     );
     return json_encode($predicateMongodoc);
   }
