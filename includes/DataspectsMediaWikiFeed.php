@@ -62,7 +62,12 @@ class DataspectsMediaWikiFeed {
   private function getParsedWikitext() {
     $parser = new \Parser();
     $parserOptions = new \ParserOptions();
-    $this->parsedWikitext = $parser->parse($this->wikitext, $this->title, $parserOptions);
+    $parsedWikitext = $parser->parse($this->wikitext, $this->title, $parserOptions);
+    if($parsedWikitext->mText) {
+      $this->parsedWikitext = $parsedWikitext->mText;
+    } else {
+      $this->parsedWikitext = '';
+    }
   }
 
   private function getEntityAnnotations() {
@@ -120,7 +125,7 @@ class DataspectsMediaWikiFeed {
       "full" => array(
         "wikitext" => $this->wikitext,
         "text" => "NOT USED BECAUSE NO TIKA HERE",
-        "html" => $this->parsedWikitext->mText
+        "html" => $this->parsedWikitext
       ),
       "categories" => $this->categories,
       "annotations" => $this->annotations,
