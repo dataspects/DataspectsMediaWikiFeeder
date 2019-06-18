@@ -8,6 +8,14 @@ class DataspectsMediaWikiFeed {
     $this->title = $title;
     $this->annotations = array();
     $this->wikiPage = \WikiPage::factory($title);
+    /*
+    * The entityMongodoc's full.html expects $this->parsedWikitext.
+    * However, for some namespaces we don't want $this->parsedWikitext.
+    * That's why we default $this->parsedWikitext = ""; and if we want
+    * $this->parsedWikitext for a specific namespace we set it by
+    * $this->getParsedWikitext();.
+    */
+    $this->parsedWikitext = "";
     switch($this->title->mNamespace) {
       case 0:
         $this->getCategories();
@@ -65,8 +73,6 @@ class DataspectsMediaWikiFeed {
     $parsedWikitext = $parser->parse($this->wikitext, $this->title, $parserOptions);
     if($parsedWikitext->mText) {
       $this->parsedWikitext = $parsedWikitext->mText;
-    } else {
-      $this->parsedWikitext = '';
     }
   }
 
