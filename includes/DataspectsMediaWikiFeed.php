@@ -15,7 +15,7 @@ class DataspectsMediaWikiFeed {
     * $this->parsedWikitext for a specific namespace we set it by
     * $this->getParsedWikitext();.
     */
-    $this->parsedWikitext = "";
+    $this->parsedWikitext = null;
     switch($this->title->mNamespace) {
       case 0:
         $this->getCategories();
