@@ -160,14 +160,15 @@ class DataspectsMediaWikiFeed {
       ],
       __METHOD__
     );
+    $req->setHeader("Authorization", "Api-Key ".$GLOBALS['wgDataspectsApiKey']);
     $req->setHeader("content-type", "application/json");
     $req->setHeader("accept", "application/json");
-    $req->setHeader("dataspects-api-key", $GLOBALS['wgDataspectsApiKey']);
 
     $status = $req->execute();
 
     if($status->isOK()) {
       $req->getContent();
+      echo $this->title->getFullURL()." sent\n";
     } else {
       echo $status;
     }
