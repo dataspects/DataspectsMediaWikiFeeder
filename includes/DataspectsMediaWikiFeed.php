@@ -121,7 +121,7 @@ class DataspectsMediaWikiFeed {
     $mongoDoc = array(
       "slug" => "pending",
       "resourceSiloType" => "pending",
-      "resourceSiloLabel" => "pending",
+      "resourceSiloLabel" => $GLOBALS['wgSitename'],
       "resourceSiloID" => "pending",
       "resourceType" => "MediaWikiPage",
       "pagename" => $this->title->mTextform,
