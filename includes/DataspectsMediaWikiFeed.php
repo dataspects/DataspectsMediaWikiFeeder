@@ -20,7 +20,7 @@ class DataspectsMediaWikiFeed {
       case 0:
         $this->getCategories();
         $this->getWikitext();
-        $this->getParsedWikitext();
+        $this->parsedWikitext = $this->getParsedWikitext($this->wikitext);
         $this->getEntityAnnotations();
         $this->url = $GLOBALS['wgDataspectsApiURL'].'mediawikis/'.$GLOBALS['wgMediaWikiMongoID']."/pages";
         $this->mongoDoc = $this->entityMongodoc();
@@ -67,12 +67,12 @@ class DataspectsMediaWikiFeed {
     }
   }
 
-  private function getParsedWikitext() {
+  private function getParsedWikitext($wikitext) {
     $parser = new \Parser();
     $parserOptions = new \ParserOptions();
-    $parsedWikitext = $parser->parse($this->wikitext, $this->title, $parserOptions);
+    $parsedWikitext = $parser->parse($wikitext, $this->title, $parserOptions);
     if($parsedWikitext->mText) {
-      $this->parsedWikitext = $parsedWikitext->mText;
+      return $parsedWikitext->mText;
     }
   }
 
@@ -84,13 +84,14 @@ class DataspectsMediaWikiFeed {
         if($propertyName[0] != '_') {
           foreach($property['dataitem'] as $object) {
 	          if(is_array($object)) {
+              $source = str_replace('#0##', '', $object['item']);
               $this->annotations[] = array(
                 'subject' => $this->title->mTextform,
                 'predicate' => $propertyName,
                 'object' => array(
-                  'source' => str_replace('#0##', '', $object['item']),
-                  'html' => '',
-                  'text' => ''
+                  'source' => $source,
+                  'html' => $this->getParsedWikitext($source),
+                  "text" => "NOT USED BECAUSE NO TIKA HERE"
                 )
               );
             }
@@ -129,9 +130,9 @@ class DataspectsMediaWikiFeed {
       "shortUrl" => $this->title->getFullURL(),
       "namespace" => $this->getNamespace($this->title->mNamespace),
       "full" => array(
-        "wikitext" => $this->wikitext,
+        "wikitext" => trim($this->wikitext),
         "text" => "NOT USED BECAUSE NO TIKA HERE",
-        "html" => $this->parsedWikitext
+        "html" => trim($this->parsedWikitext)
       ),
       "categories" => $this->categories,
       "annotations" => $this->annotations,
