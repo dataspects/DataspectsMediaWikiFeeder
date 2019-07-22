@@ -22,19 +22,19 @@ class DataspectsMediaWikiFeed {
         $this->getWikitext();
         $this->parsedWikitext = $this->getParsedWikitext($this->wikitext);
         $this->getEntityAnnotations();
-        $this->url = $GLOBALS['wgDataspectsApiURL'].'mediawikis/'.$GLOBALS['wgMediaWikiMongoID']."/pages";
+        $this->url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgMediaWikiMongoID']."/pages";
         $this->mongoDoc = $this->entityMongodoc();
         break;
       case 10:
         $this->getCategories();
         $this->getWikitext();
-        $this->url = $GLOBALS['wgDataspectsApiURL'].'mediawikis/'.$GLOBALS['wgMediaWikiMongoID']."/pages";
+        $this->url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgMediaWikiMongoID']."/pages";
         $this->mongoDoc = $this->entityMongodoc();
         break;
       case 106:
         $this->getCategories();
         $this->getWikitext();
-        $this->url = $GLOBALS['wgDataspectsApiURL'].'mediawikis/'.$GLOBALS['wgMediaWikiMongoID']."/pages";
+        $this->url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgMediaWikiMongoID']."/pages";
         $this->mongoDoc = $this->entityMongodoc();
         break;
       case 102:
