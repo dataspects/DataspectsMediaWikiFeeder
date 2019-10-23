@@ -12,7 +12,7 @@ This MediaWiki extension feeds MediaWiki page data into a MongoDB. It is part of
 ```
 wfLoadExtension( 'DataspectsMediaWikiFeeder' );
 $wgRateLimits['edit']['ip'] = array( 1000, 1 );
-$wgMediaWikiMongoID = "";
+$wgDataspectsMediaWikiID = "";
 $wgDataspectsApiKey = "";
 $wgDataspectsApiURL = "";
 ```

@@ -22,19 +22,19 @@ class DataspectsMediaWikiFeed {
         $this->getWikitext();
         $this->parsedWikitext = $this->getParsedWikitext($this->wikitext);
         $this->getEntityAnnotations();
-        $this->url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgMediaWikiMongoID']."/pages";
+        $this->url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgDataspectsMediaWikiID']."/pages";
         $this->mongoDoc = $this->entityMongodoc();
         break;
       case 10:
         $this->getCategories();
         $this->getWikitext();
-        $this->url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgMediaWikiMongoID']."/pages";
+        $this->url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgDataspectsMediaWikiID']."/pages";
         $this->mongoDoc = $this->entityMongodoc();
         break;
       case 106:
         $this->getCategories();
         $this->getWikitext();
-        $this->url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgMediaWikiMongoID']."/pages";
+        $this->url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgDataspectsMediaWikiID']."/pages";
         $this->mongoDoc = $this->entityMongodoc();
         break;
       case 102:
@@ -129,11 +129,8 @@ class DataspectsMediaWikiFeed {
       "rawUrl" => $this->title->getInternalURL(),
       "shortUrl" => $this->title->getFullURL(),
       "namespace" => $this->getNamespace($this->title->mNamespace),
-      "full" => array(
-        "wikitext" => trim($this->wikitext),
-        "text" => "NOT USED BECAUSE NO TIKA HERE",
-        "html" => trim($this->parsedWikitext)
-      ),
+      "wikitext" => trim($this->wikitext),
+      "html" => trim($this->parsedWikitext),
       "categories" => $this->categories,
       "annotations" => $this->annotations,
       "feederClass" =>"DataspectsMediaWikiFeeder"
