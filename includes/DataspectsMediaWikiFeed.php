@@ -88,11 +88,8 @@ class DataspectsMediaWikiFeed {
               $this->annotations[] = array(
                 'subject' => $this->title->mTextform,
                 'predicate' => $propertyName,
-                'object' => array(
-                  'source' => $source,
-                  'html' => $this->getParsedWikitext($source),
-                  "text" => "NOT USED BECAUSE NO TIKA HERE"
-                )
+                'objectSource' => $source,
+                'objectHtml' => $this->getParsedWikitext($source)
               );
             }
           }
