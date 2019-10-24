@@ -22,6 +22,7 @@ class DataspectsMediaWikiFeed {
         $this->getWikitext();
         $this->parsedWikitext = $this->getParsedWikitext($this->wikitext);
         $this->getEntityAnnotations();
+        $this->getIncomingAndOutgoingLinks();
         $this->url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgDataspectsMediaWikiID']."/pages";
         $this->mongoDoc = $this->entityMongodoc();
         break;
@@ -95,6 +96,25 @@ class DataspectsMediaWikiFeed {
           }
         }
       }
+    }
+  }
+
+  private function getIncomingAndOutgoingLinks() {
+    foreach($this->title->getLinksFrom() as $linkFrom) {
+      $this->annotations[] = array(
+        'subject' => $this->title->mTextform,
+        'predicate' => "LinksTo",
+        'objectSource' => $linkFrom->getInternalURL(),
+        'objectHtml' => $linkFrom->getInternalURL()
+      );
+    }
+    foreach($this->title->getLinksTo() as $linkTo) {
+      $this->annotations[] = array(
+        'subject' => $this->title->mTextform,
+        'predicate' => "IsLinkedToFrom",
+        'objectSource' => $linkTo->getInternalURL(),
+        'objectHtml' => $linkTo->getInternalURL()
+      );
     }
   }
 
