@@ -175,7 +175,7 @@ class DataspectsMediaWikiFeed {
       ],
       __METHOD__
     );
-    $req->setHeader("Authorization", "Api-Key ".$GLOBALS['wgDataspectsApiKey']);
+    $req->setHeader("Authorization", "Bearer ".$GLOBALS['wgDataspectsApiKey']);
     $req->setHeader("content-type", "application/json");
     $req->setHeader("accept", "application/json");
 
