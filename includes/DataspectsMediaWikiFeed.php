@@ -41,7 +41,7 @@ class DataspectsMediaWikiFeed {
       case 102:
         $this->getCategories();
         $this->getPredicateAnnotations();
-        $this->url = $GLOBALS['wgDataspectsApiURL'].'predicates';
+        $this->url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgDataspectsMediaWikiID']."/predicates";
         $this->mongoDoc = $this->predicateMongodoc();
         break;
       default:
