@@ -166,7 +166,53 @@ class DataspectsMediaWikiFeed {
     return json_encode($predicateMongodoc);
   }
 
-  public function sendToMongoDB() {
+  public function sendToDatastore() {
+    // Check if the page exists in the datastore
+    $req = \MWHttpRequest::factory(
+      $this->url."?rawUrl=".$this->title->getFullURL(),
+      [
+        "method" => "get"
+      ],
+      __METHOD__
+    );
+    $req->setHeader("Authorization", "Bearer ".$GLOBALS['wgDataspectsApiKey']);
+    $req->setHeader("content-type", "application/json");
+    $req->setHeader("accept", "application/json");
+    $status = $req->execute();
+    if($status->isOK()) {
+      echo $this->title->getFullURL()." checked\n";
+      $content = json_decode($req->getContent());
+      if($content->pages[0]->id) {
+        $this->updatePage($content->pages[0]->id);
+      } else {
+        $this->addPage();
+      }     
+    } else {
+      echo $status;
+    }
+  }
+
+  private function updatePage($pageID) {
+    $req = \MWHttpRequest::factory(
+      $this->url."/".$pageID,
+      [
+        "method" => "post",
+        "postData" => $this->mongoDoc
+      ],
+      __METHOD__
+    );
+    $req->setHeader("Authorization", "Bearer ".$GLOBALS['wgDataspectsApiKey']);
+    $req->setHeader("content-type", "application/json");
+    $req->setHeader("accept", "application/json");
+    $status = $req->execute();
+    if($status->isOK()) {
+      echo $this->title->getFullURL()." updated\n";
+    } else {
+      echo $status;
+    }
+  }
+
+  private function addPage() {
     $req = \MWHttpRequest::factory(
       $this->url,
       [
@@ -178,12 +224,9 @@ class DataspectsMediaWikiFeed {
     $req->setHeader("Authorization", "Bearer ".$GLOBALS['wgDataspectsApiKey']);
     $req->setHeader("content-type", "application/json");
     $req->setHeader("accept", "application/json");
-
     $status = $req->execute();
-
     if($status->isOK()) {
-      $req->getContent();
-      echo $this->title->getFullURL()." sent\n";
+      echo $this->title->getFullURL()." created\n";
     } else {
       echo $status;
     }

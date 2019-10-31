@@ -17,7 +17,7 @@ class DMFFeedAll extends Maintenance {
 
 	public function execute() {
 		// api.php?action=query&meta=siteinfo&siprop=namespaces
-    	$this->feedNamespace(0); // Mainspace
+		$this->feedNamespace(0); // Mainspace
 		$this->feedNamespace(10); // Template
 		$this->feedNamespace(106); // Form
 		// $this->feedNamespace(102); // Property
@@ -26,7 +26,7 @@ class DMFFeedAll extends Maintenance {
 	private function feedNamespace(int $namespaceNumber) {
 		foreach($this->pageTitlesInNamespace($namespaceNumber) as $title) {
 			$dmwf = new \MediaWiki\Extension\DataspectsMediaWikiFeeder\DataspectsMediaWikiFeed($title);
-			$dmwf->sendToMongoDB();
+			$dmwf->sendToDatastore();
 		}
 	}
 
