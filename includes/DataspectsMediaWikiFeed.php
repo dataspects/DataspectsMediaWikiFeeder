@@ -112,8 +112,7 @@ class DataspectsMediaWikiFeed {
       $this->annotations[] = array(
         'subject' => $this->title->mTextform,
         'predicate' => "IsLinkedToFrom",
-        'objectSource' => $linkTo->getInternalURL(),
-        'objectHtml' => $linkTo->getInternalURL()
+        'object' => $linkTo->getInternalURL()
       );
     }
   }
@@ -134,13 +133,11 @@ class DataspectsMediaWikiFeed {
     }
   }
 
+  # LEX200122141600
+
   private function entityMongodoc() {
     $mongoDoc = array(
-      "slug" => "pending",
-      "resourceSiloType" => "pending",
       "resourceSiloLabel" => $GLOBALS['wgSitename'],
-      "resourceSiloID" => "pending",
-      "resourceType" => "MediaWikiPage",
       "pagename" => $this->title->mTextform,
       // Do we want the index.php?title= form here?
       "rawUrl" => $this->title->getInternalURL(),
@@ -149,8 +146,7 @@ class DataspectsMediaWikiFeed {
       "wikitext" => trim($this->wikitext),
       "html" => trim($this->parsedWikitext),
       "categories" => $this->categories,
-      "annotations" => $this->annotations,
-      "feederClass" =>"DataspectsMediaWikiFeeder"
+      "annotations" => $this->annotations
     );
     return json_encode($mongoDoc);
   }
