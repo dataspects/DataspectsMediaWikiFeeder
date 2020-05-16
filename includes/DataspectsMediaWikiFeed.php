@@ -9,7 +9,7 @@ class DataspectsMediaWikiFeed {
     $this->annotations = array();
     $this->wikiPage = \WikiPage::factory($title);
     /*
-    * The entityMongodoc's full.html expects $this->parsedWikitext.
+    * The getMediaWikiPage's full.html expects $this->parsedWikitext.
     * However, for some namespaces we don't want $this->parsedWikitext.
     * That's why we default $this->parsedWikitext = ""; and if we want
     * $this->parsedWikitext for a specific namespace we set it by
@@ -21,28 +21,28 @@ class DataspectsMediaWikiFeed {
         $this->getCategories();
         $this->getWikitext();
         $this->parsedWikitext = $this->getParsedWikitext($this->wikitext);
-        $this->getEntityAnnotations();
+        $this->getMediaWikiPageAnnotations();
         $this->getIncomingAndOutgoingLinks();
         $this->url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgDataspectsMediaWikiID']."/pages";
-        $this->mongoDoc = $this->entityMongodoc();
+        $this->mediaWikiPage = $this->getMediaWikiPage();
         break;
       case 10:
         $this->getCategories();
         $this->getWikitext();
         $this->url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgDataspectsMediaWikiID']."/pages";
-        $this->mongoDoc = $this->entityMongodoc();
+        $this->mediaWikiPage = $this->getMediaWikiPage();
         break;
       case 106:
         $this->getCategories();
         $this->getWikitext();
         $this->url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgDataspectsMediaWikiID']."/pages";
-        $this->mongoDoc = $this->entityMongodoc();
+        $this->mediaWikiPage = $this->getMediaWikiPage();
         break;
       case 102:
         $this->getCategories();
         $this->getPredicateAnnotations();
         $this->url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgDataspectsMediaWikiID']."/predicates";
-        $this->mongoDoc = $this->predicateMongodoc();
+        $this->mediaWikiPage = $this->predicateMongodoc();
         break;
       default:
         echo "ERROR in determining namespace ".$this->title->mNamespace."\n";
@@ -77,7 +77,7 @@ class DataspectsMediaWikiFeed {
     }
   }
 
-  private function getEntityAnnotations() {
+  private function getMediaWikiPageAnnotations() {
     $data = $this->browseBySubject($this->title);
     foreach($data['query']['data'] as $property) {
       if(is_array($property)) {
@@ -87,9 +87,9 @@ class DataspectsMediaWikiFeed {
 	          if(is_array($object)) {
               $source = str_replace('#0##', '', $object['item']);
               $this->annotations[] = array(
-                'subject' => $this->title->mTextform,
+                'subject' => $this->title->getFullURL(),
                 'predicate' => $propertyName,
-                'objectSource' => $source,
+                'object' => $source,
                 'objectHtml' => $this->getParsedWikitext($source)
               );
             }
@@ -102,7 +102,7 @@ class DataspectsMediaWikiFeed {
   private function getIncomingAndOutgoingLinks() {
     foreach($this->title->getLinksFrom() as $linkFrom) {
       $this->annotations[] = array(
-        'subject' => $this->title->mTextform,
+        'subject' => $this->title->getFullURL(),
         'predicate' => "LinksTo",
         'objectSource' => $linkFrom->getInternalURL(),
         'objectHtml' => $linkFrom->getInternalURL()
@@ -110,7 +110,7 @@ class DataspectsMediaWikiFeed {
     }
     foreach($this->title->getLinksTo() as $linkTo) {
       $this->annotations[] = array(
-        'subject' => $this->title->mTextform,
+        'subject' => $this->title->getFullURL(),
         'predicate' => "IsLinkedToFrom",
         'object' => $linkTo->getInternalURL()
       );
@@ -135,8 +135,9 @@ class DataspectsMediaWikiFeed {
 
   # LEX200122141600
 
-  private function entityMongodoc() {
-    $mongoDoc = array(
+  private function getMediaWikiPage() {
+    $mediaWikiPage = array(
+      "pageID" => $this->title->mArticleID,
       "resourceSiloLabel" => $GLOBALS['wgSitename'],
       "pagename" => $this->title->mTextform,
       // Do we want the index.php?title= form here?
@@ -148,7 +149,7 @@ class DataspectsMediaWikiFeed {
       "categories" => $this->categories,
       "annotations" => $this->annotations
     );
-    return json_encode($mongoDoc);
+    return json_encode($mediaWikiPage);
   }
 
   private function predicateMongodoc() {
@@ -164,56 +165,56 @@ class DataspectsMediaWikiFeed {
 
   public function sendToDatastore() {
     // Check if the page exists in the datastore
-    $req = \MWHttpRequest::factory(
-      $this->url."?rawUrl=".$this->title->getFullURL(),
-      [
-        "method" => "get"
-      ],
-      __METHOD__
-    );
-    $req->setHeader("Authorization", "Bearer ".$GLOBALS['wgDataspectsApiKey']);
-    $req->setHeader("content-type", "application/json");
-    $req->setHeader("accept", "application/json");
-    $status = $req->execute();
-    if($status->isOK()) {
-      echo $this->title->getFullURL()." checked\n";
-      $content = json_decode($req->getContent());
-      if($content->pages[0]->id) {
-        $this->updatePage($content->pages[0]->id);
-      } else {
+    // $req = \MWHttpRequest::factory(
+    //   $this->url."?rawUrl=".$this->title->getFullURL(),
+    //   [
+    //     "method" => "get"
+    //   ],
+    //   __METHOD__
+    // );
+    // $req->setHeader("Authorization", "Bearer ".$GLOBALS['wgDataspectsApiKey']);
+    // $req->setHeader("content-type", "application/json");
+    // $req->setHeader("accept", "application/json");
+    // $status = $req->execute();
+    // if($status->isOK()) {
+    //   echo $this->title->getFullURL()." checked\n";
+    //   $content = json_decode($req->getContent());
+    //   if($content->pages[0]->id) {
+    //     $this->updatePage($content->pages[0]->id);
+    //   } else {
         $this->addPage();
-      }     
-    } else {
-      echo $status;
-    }
+    //   }     
+    // } else {
+    //   echo $status;
+    // }
   }
 
-  private function updatePage($pageID) {
-    $req = \MWHttpRequest::factory(
-      $this->url."/".$pageID,
-      [
-        "method" => "post",
-        "postData" => $this->mongoDoc
-      ],
-      __METHOD__
-    );
-    $req->setHeader("Authorization", "Bearer ".$GLOBALS['wgDataspectsApiKey']);
-    $req->setHeader("content-type", "application/json");
-    $req->setHeader("accept", "application/json");
-    $status = $req->execute();
-    if($status->isOK()) {
-      echo $this->title->getFullURL()." updated\n";
-    } else {
-      echo $status;
-    }
-  }
+  // private function updatePage($pageID) {
+  //   $req = \MWHttpRequest::factory(
+  //     $this->url."/".$pageID,
+  //     [
+  //       "method" => "post",
+  //       "postData" => $this->mediaWikiPage
+  //     ],
+  //     __METHOD__
+  //   );
+  //   $req->setHeader("Authorization", "Bearer ".$GLOBALS['wgDataspectsApiKey']);
+  //   $req->setHeader("content-type", "application/json");
+  //   $req->setHeader("accept", "application/json");
+  //   $status = $req->execute();
+  //   if($status->isOK()) {
+  //     echo $this->title->getFullURL()." updated\n";
+  //   } else {
+  //     echo $status;
+  //   }
+  // }
 
   private function addPage() {
     $req = \MWHttpRequest::factory(
       $this->url,
       [
         "method" => "post",
-        "postData" => $this->mongoDoc
+        "postData" => $this->mediaWikiPage
       ],
       __METHOD__
     );
@@ -223,6 +224,7 @@ class DataspectsMediaWikiFeed {
     $status = $req->execute();
     if($status->isOK()) {
       echo $this->title->getFullURL()." created\n";
+      echo "Sent to ".$this->url."\n";
     } else {
       echo $status;
     }

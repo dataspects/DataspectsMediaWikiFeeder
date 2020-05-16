@@ -23,7 +23,7 @@ class DataspectsMediaWikiFeederJob extends \Job {
     // https://doc.wikimedia.org/mediawiki-core/master/php/classWikiPage.html
     // https://www.mediawiki.org/wiki/Manual:WikiPage.php
     $dmwf = new \MediaWiki\Extension\DataspectsMediaWikiFeeder\DataspectsMediaWikiFeed($this->title);
-    $dmwf->sendToMongoDB();
+    $dmwf->sendToDatastore();
   }
 
 }
