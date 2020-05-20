@@ -20,7 +20,9 @@
 		}
 	},
 	"Hooks": {
-		"PageContentSaveComplete": "MediaWiki\\Extension\\DataspectsMediaWikiFeeder\\Hooks::onPageContentSaveComplete"
+		"PageContentSaveComplete": "MediaWiki\\Extension\\DataspectsMediaWikiFeeder\\Hooks::onPageContentSaveComplete",
+		"ArticleDeleteComplete": "MediaWiki\\Extension\\DataspectsMediaWikiFeeder\\Hooks::onArticleDeleteComplete",
+		"TitleMoveComplete": "MediaWiki\\Extension\\DataspectsMediaWikiFeeder\\Hooks::onTitleMoveComplete"
 	},
 	"MessagesDirs": {
 		"DataspectsMediaWikiFeeder": [
@@ -40,7 +42,7 @@
 		}
 	},
 	"JobClasses": {
-		"DataspectsMediaWikiFeederJob": "MediaWiki\\Extension\\DataspectsMediaWikiFeeder\\DataspectsMediaWikiFeederJob"
+		"DataspectsMediaWikiFeederSendJob": "MediaWiki\\Extension\\DataspectsMediaWikiFeeder\\DataspectsMediaWikiFeederSendJob"
 	},
 	"manifest_version": 2
 }

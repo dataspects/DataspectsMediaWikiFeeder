@@ -2,7 +2,7 @@
 
 namespace MediaWiki\Extension\DataspectsMediaWikiFeeder;
 
-class DataspectsMediaWikiFeederJob extends \Job {
+class DataspectsMediaWikiFeederSendJob extends \Job {
   // https://doc.wikimedia.org/mediawiki-core/master/php/classJob.html
 
   private $annotations = [];
@@ -15,7 +15,7 @@ class DataspectsMediaWikiFeederJob extends \Job {
   public function __construct(\Title $title) {
     // https://doc.wikimedia.org/mediawiki-core/master/php/classTitle.html
     // https://www.mediawiki.org/wiki/Manual:Title.php#Functions
-    parent::__construct("DataspectsMediaWikiFeederJob", []);
+    parent::__construct("DataspectsMediaWikiFeederSendJob", []);
     $this->title = $title;
   }
 

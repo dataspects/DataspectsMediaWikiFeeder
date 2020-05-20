@@ -6,8 +6,33 @@ class DataspectsMediaWikiFeed {
 
   public function __construct(\Title $title) {
     $this->title = $title;
+  }
+
+  public function sendToDatastore() {
+    // Check if the page exists in the datastore
+    // $req = \MWHttpRequest::factory(
+    //   $this->url."?rawUrl=".$this->title->getFullURL(),
+    //   [
+    //     "method" => "get"
+    //   ],
+    //   __METHOD__
+    // );
+    // $req->setHeader("Authorization", "Bearer ".$GLOBALS['wgDataspectsApiKey']);
+    // $req->setHeader("content-type", "application/json");
+    // $req->setHeader("accept", "application/json");
+    // $status = $req->execute();
+    // if($status->isOK()) {
+    //   echo $this->title->getFullURL()." checked\n";
+    //   $content = json_decode($req->getContent());
+    //   if($content->pages[0]->id) {
+    //     $this->updatePage($content->pages[0]->id);
+    //   } else {
+    //   }     
+    // } else {
+    //   echo $status;
+    // }
     $this->annotations = array();
-    $this->wikiPage = \WikiPage::factory($title);
+    $this->wikiPage = \WikiPage::factory($this->title);
     /*
     * The getMediaWikiPage's full.html expects $this->parsedWikitext.
     * However, for some namespaces we don't want $this->parsedWikitext.
@@ -48,6 +73,7 @@ class DataspectsMediaWikiFeed {
         echo "ERROR in determining namespace ".$this->title->mNamespace."\n";
         break;
     }
+    $this->addPage();
   }
 
   private function getCategories() {
@@ -163,31 +189,7 @@ class DataspectsMediaWikiFeed {
     return json_encode($predicateMongodoc);
   }
 
-  public function sendToDatastore() {
-    // Check if the page exists in the datastore
-    // $req = \MWHttpRequest::factory(
-    //   $this->url."?rawUrl=".$this->title->getFullURL(),
-    //   [
-    //     "method" => "get"
-    //   ],
-    //   __METHOD__
-    // );
-    // $req->setHeader("Authorization", "Bearer ".$GLOBALS['wgDataspectsApiKey']);
-    // $req->setHeader("content-type", "application/json");
-    // $req->setHeader("accept", "application/json");
-    // $status = $req->execute();
-    // if($status->isOK()) {
-    //   echo $this->title->getFullURL()." checked\n";
-    //   $content = json_decode($req->getContent());
-    //   if($content->pages[0]->id) {
-    //     $this->updatePage($content->pages[0]->id);
-    //   } else {
-        $this->addPage();
-    //   }     
-    // } else {
-    //   echo $status;
-    // }
-  }
+  
 
   // private function updatePage($pageID) {
   //   $req = \MWHttpRequest::factory(
@@ -207,7 +209,7 @@ class DataspectsMediaWikiFeed {
   //   } else {
   //     echo $status;
   //   }
-  // }
+  // }  
 
   private function addPage() {
     $req = \MWHttpRequest::factory(
@@ -223,10 +225,10 @@ class DataspectsMediaWikiFeed {
     $req->setHeader("accept", "application/json");
     $status = $req->execute();
     if($status->isOK()) {
-      echo $this->title->getFullURL()." created\n";
-      echo "Sent to ".$this->url."\n";
+      echo "DATASPECTS: page JSON ".$this->title->getFullURL()." created\n";
+      echo "DATASPECTS: page sent to ".$this->url."\n";
     } else {
-      echo $status;
+      echo "DATASPECTS: ".$status;
     }
   }
 

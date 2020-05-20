@@ -27,8 +27,33 @@ class Hooks {
 	 * @param array $arg2
 	 */
 	public static function onPageContentSaveComplete( $wikiPage ) {
-		$job = new DataspectsMediaWikiFeederJob($wikiPage->getTitle());
+		$job = new DataspectsMediaWikiFeederSendJob($wikiPage->getTitle());
 		\JobQueueGroup::singleton()->lazyPush($job);
+	}
+
+	public static function onArticleDeleteComplete( $wikiPage, $user, $reason, $id ) {
+		// I tried to put this code into a Job...
+		$url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgDataspectsMediaWikiID']."/pages/".$id;
+		$req = \MWHttpRequest::factory(
+		$url,
+		[
+			"method" => "delete"
+		],
+		__METHOD__
+		);
+		$req->setHeader("Authorization", "Bearer ".$GLOBALS['wgDataspectsApiKey']);
+		$req->setHeader("content-type", "application/json");
+		$req->setHeader("accept", "application/json");
+		$status = $req->execute();
+		if($status->isOK()) {
+			
+		} else {
+			echo $status;
+		}
+	}
+
+	public static function onTitleMoveComplete( Title &$title, Title &$newTitle, User $user, $oldid, $newid ) {
+		// PENDING!
 	}
 
 }
