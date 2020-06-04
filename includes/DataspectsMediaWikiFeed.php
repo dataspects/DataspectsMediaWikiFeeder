@@ -8,6 +8,27 @@ class DataspectsMediaWikiFeed {
     $this->title = $title;
   }
 
+  static function deleteFromDatastore($id) {
+		// Run this code immediately rather than through a job.
+		$url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgDataspectsMediaWikiID']."/pages/".$id;
+		$req = \MWHttpRequest::factory(
+		$url,
+		[
+			"method" => "delete"
+		],
+		__METHOD__
+		);
+		$req->setHeader("Authorization", "Bearer ".$GLOBALS['wgDataspectsApiKey']);
+		$req->setHeader("content-type", "application/json");
+		$req->setHeader("accept", "application/json");
+		$status = $req->execute();
+		if($status->isOK()) {
+			
+		} else {
+			echo $status;
+		}
+	}
+
   public function sendToDatastore() {
     // Check if the page exists in the datastore
     // $req = \MWHttpRequest::factory(

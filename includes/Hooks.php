@@ -32,28 +32,17 @@ class Hooks {
 	}
 
 	public static function onArticleDeleteComplete( $wikiPage, $user, $reason, $id ) {
-		// I tried to put this code into a Job...
-		$url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgDataspectsMediaWikiID']."/pages/".$id;
-		$req = \MWHttpRequest::factory(
-		$url,
-		[
-			"method" => "delete"
-		],
-		__METHOD__
-		);
-		$req->setHeader("Authorization", "Bearer ".$GLOBALS['wgDataspectsApiKey']);
-		$req->setHeader("content-type", "application/json");
-		$req->setHeader("accept", "application/json");
-		$status = $req->execute();
-		if($status->isOK()) {
-			
-		} else {
-			echo $status;
-		}
+		\MediaWiki\Extension\DataspectsMediaWikiFeeder\DataspectsMediaWikiFeed::deleteFromDatastore($id);
 	}
 
-	public static function onTitleMoveComplete( Title &$title, Title &$newTitle, User $user, $oldid, $newid ) {
-		// PENDING!
+	public static function onTitleMoveComplete( $title, $newTitle, $user, $oldid, $newid ) {
+		\MediaWiki\Extension\DataspectsMediaWikiFeeder\DataspectsMediaWikiFeed::deleteFromDatastore($oldid);
+		$job = new DataspectsMediaWikiFeederSendJob($newTitle);
+		\JobQueueGroup::singleton()->lazyPush($job);
+		if($newid == 0) {
+			// LEX2006041158
+			// $newid = database page_id of the created redirect, or 0 if the redirect was suppressed
+		}
 	}
 
 }
