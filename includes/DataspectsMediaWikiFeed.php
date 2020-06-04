@@ -90,6 +90,8 @@ class DataspectsMediaWikiFeed {
         $this->url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgDataspectsMediaWikiID']."/predicates";
         $this->mediaWikiPage = $this->predicateMongodoc();
         break;
+      case 6: // File LEX2006041204
+        break;
       default:
         echo "ERROR in determining namespace ".$this->title->mNamespace."\n";
         break;
