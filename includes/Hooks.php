@@ -27,8 +27,22 @@ class Hooks {
 	 * @param array $arg2
 	 */
 	public static function onPageContentSaveComplete( $wikiPage ) {
-		$job = new DataspectsMediaWikiFeederJob($wikiPage->getTitle());
+		$job = new DataspectsMediaWikiFeederSendJob($wikiPage->getTitle());
 		\JobQueueGroup::singleton()->lazyPush($job);
+	}
+
+	public static function onArticleDeleteComplete( $wikiPage, $user, $reason, $id ) {
+		\MediaWiki\Extension\DataspectsMediaWikiFeeder\DataspectsMediaWikiFeed::deleteFromDatastore($id);
+	}
+
+	public static function onTitleMoveComplete( $title, $newTitle, $user, $oldid, $newid ) {
+		\MediaWiki\Extension\DataspectsMediaWikiFeeder\DataspectsMediaWikiFeed::deleteFromDatastore($oldid);
+		$job = new DataspectsMediaWikiFeederSendJob($newTitle);
+		\JobQueueGroup::singleton()->lazyPush($job);
+		if($newid == 0) {
+			// LEX2006041158
+			// $newid = database page_id of the created redirect, or 0 if the redirect was suppressed
+		}
 	}
 
 }
