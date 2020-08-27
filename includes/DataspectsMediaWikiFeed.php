@@ -71,6 +71,15 @@ class DataspectsMediaWikiFeed {
         $this->getIncomingAndOutgoingLinks();
         $this->url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgDataspectsMediaWikiID']."/pages";
         $this->mediaWikiPage = $this->getMediaWikiPage();
+	break;
+      case 4:
+        $this->getCategories();
+        $this->getWikitext();
+        $this->parsedWikitext = $this->getParsedWikitext($this->wikitext);
+        $this->getMediaWikiPageAnnotations();
+        $this->getIncomingAndOutgoingLinks();
+        $this->url = $GLOBALS['wgDataspectsApiURL'].$GLOBALS['wgDataspectsMediaWikiID']."/pages";
+        $this->mediaWikiPage = $this->getMediaWikiPage();
         break;
       case 10:
         $this->getCategories();
