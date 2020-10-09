@@ -3,7 +3,7 @@
     [[ReactsToChangesIn::MediaWiki Core]]
     [[ReactsToChangesIn::MediaWiki API]]
 
-This MediaWiki extension feeds MediaWiki page data into a MongoDB. It is part of https://cookbook.findandlearn.net/wiki/DataspectsSearch.
+This MediaWiki extension feeds MediaWiki page data to [dataspects](https://dataspects.com/).
 
 ## Installation
 
