@@ -195,17 +195,18 @@ class DataspectsMediaWikiFeed {
 
   private function getMediaWikiPage() {
     $mediaWikiPage = array(
-      "pageID" => $this->title->mArticleID,
-      "resourceSiloLabel" => $GLOBALS['wgSitename'],
-      "pagename" => $this->title->mTextform,
+      "mw0__pageID" => $this->title->mArticleID,
+      "ds0__resourceSiloURI" => $GLOBALS['wgDS0ResourceSiloURI'],
+      "mw0__pagename" => $this->title->mTextform,
       // Do we want the index.php?title= form here?
-      "rawUrl" => $this->title->getInternalURL(),
-      "shortUrl" => $this->title->getFullURL(),
-      "namespace" => $this->getNamespace($this->title->mNamespace),
-      "wikitext" => trim($this->wikitext),
-      "html" => trim($this->parsedWikitext),
+      "mw0__rawUrl" => $this->title->getInternalURL(),
+      "mw0__shortUrl" => $this->title->getFullURL(),
+      "mw0__namespace" => $this->getNamespace($this->title->mNamespace),
+      "mw0__wikiText" => trim($this->wikitext),
+      "mw0__html" => trim($this->parsedWikitext),
       "categories" => $this->categories,
-      "annotations" => $this->annotations
+      "annotations" => $this->annotations,
+      "ds0__indexingJob" => $GLOBALS['wgDS0IndexingJob'],
     );
     return json_encode($mediaWikiPage);
   }
