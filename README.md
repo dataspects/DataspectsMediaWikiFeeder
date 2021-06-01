@@ -3,7 +3,7 @@
     [[ReactsToChangesIn::MediaWiki Core]]
     [[ReactsToChangesIn::MediaWiki API]]
 
-This MediaWiki extension feeds MediaWiki page data to [dataspects](https://dataspects.com/).
+This MediaWiki extension feeds MediaWiki page data into [dataspects system](https://dataspects.com/).
 
 ## Installation
 
@@ -11,8 +11,9 @@ This MediaWiki extension feeds MediaWiki page data to [dataspects](https://datas
 
 ```
 wfLoadExtension( 'DataspectsMediaWikiFeeder' );
-$wgRateLimits['edit']['ip'] = array( 1000, 1 );
 $wgDataspectsMediaWikiID = "";
+$wgDS0ResourceSiloURI = "https://wiki.dataspects.com/wiki/";
+$wgDS0IndexingJob = "";
 $wgDataspectsApiKey = "";
 $wgDataspectsApiURL = "";
 ```
