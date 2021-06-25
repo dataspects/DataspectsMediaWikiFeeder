@@ -108,6 +108,9 @@ class DataspectsMediaWikiFeed {
     $this->addPage();
   }
 
+  /*
+    LEX2106251826: https://search.dataspects.com/understand/
+  */
   private function getCategories() {
     $this->categories = array();
     $categories = $this->wikiPage->getCategories();
