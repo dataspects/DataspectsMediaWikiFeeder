@@ -26,6 +26,7 @@ class DMFFeedAll extends Maintenance {
 
 	private function feedNamespace(int $namespaceNumber) {
 		foreach($this->pageTitlesInNamespace($namespaceNumber) as $title) {
+			echo $title;
 			$dmwf = new \MediaWiki\Extension\DataspectsMediaWikiFeeder\DataspectsMediaWikiFeed($title);
 			$dmwf->sendToDatastore();
 		}
