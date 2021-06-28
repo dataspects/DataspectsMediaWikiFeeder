@@ -303,7 +303,7 @@ class DataspectsMediaWikiFeed {
 
   private function getNamespace($index) {
     if($index == 0) {
-      $namespace = 'Mainspace';
+      $namespace = 'main';
     } else {
       $namespace = \MWNamespace::getCanonicalName($index);
     }
