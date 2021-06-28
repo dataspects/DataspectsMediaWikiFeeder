@@ -188,7 +188,8 @@ class DataspectsMediaWikiFeed {
                 'subject' => $this->title->getFullURL(),
                 'predicate' => $propertyName,
                 'objectLiteral' => $source,
-                'objectLiteralHTML' => $this->getParsedWikitext($source)
+                'objectLiteralHTML' => $this->getParsedWikitext($source),
+                'smwPropertyType' => $object['type']
               );
             }
           }
@@ -214,7 +215,8 @@ class DataspectsMediaWikiFeed {
         foreach($property['dataitem'] as $object) {
           if(is_array($object)) {
             $this->annotations[$propertyName] = array(
-              'objectLiteral' => $object['item']
+              'objectLiteral' => $object['item'],
+              'smwPropertyType' => $object['type']
             );
           }
         }
