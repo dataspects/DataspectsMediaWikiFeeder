@@ -66,8 +66,7 @@ class DataspectsMediaWikiFeed {
       case 0:
         $this->getCategories();
 	$this->getWikitext();
-	$this->getSections();
-	print_r($this->sections);
+	$this->getParse();
         $this->parsedWikitext = $this->getParsedWikitext($this->wikitext);
         $this->getMediaWikiPageAnnotations();
         $this->getIncomingAndOutgoingLinks();
@@ -140,12 +139,13 @@ class DataspectsMediaWikiFeed {
     }
   }
 
-  private function getSections() {
+  private function getParse() {
     $params = new \FauxRequest(
       array(
         'action' => 'parse',
-        'page' => $this->title,
-        "prop" => "wikitext|text|categories|templates|links|externallinks|sections|properties",
+	'page' => $this->title,
+	# The following prop list is also used in dataspects-cli/mediawiki/loaders.go (LEX2106281051)
+        "prop" => "categories|templates|images|externallinks|sections",
         "disablelimitreport" => "yes",
         "disableeditsection" => "yes",
       )
@@ -157,6 +157,21 @@ class DataspectsMediaWikiFeed {
 	if(is_numeric($i)) {
 	    	$this->sections[] = $section;
 	}
+    }
+    foreach($data["parse"]["templates"] as $template) {
+	if(is_array($template)) {
+		$this->templates[] = $template;
+	}
+    }
+    foreach($data["parse"]["images"] as $i => $image) {
+    	if(is_numeric($i)) {
+		$this->images[] = $image;
+	}
+    }
+    foreach($data["parse"]["externallinks"] as $i => $externalLink) {
+	    if(is_numeric($i)) {
+                $this->outgoingLinks[] = $externalLink;
+        }
     }
   }
 
@@ -184,19 +199,10 @@ class DataspectsMediaWikiFeed {
 
   private function getIncomingAndOutgoingLinks() {
     foreach($this->title->getLinksFrom() as $linkFrom) {
-      $this->annotations[] = array(
-        'subject' => $this->title->getFullURL(),
-        'predicate' => "LinksTo",
-        'objectSource' => $linkFrom->getInternalURL(),
-        'objectHtml' => $linkFrom->getInternalURL()
-      );
+	$this->outgoingLinks[] = $linkFrom->getInternalURL();
     }
     foreach($this->title->getLinksTo() as $linkTo) {
-      $this->annotations[] = array(
-        'subject' => $this->title->getFullURL(),
-        'predicate' => "IsLinkedToFrom",
-        'object' => $linkTo->getInternalURL()
-      );
+        $this->incomingLinks[] = $linkTo->getInternalURL();
     }
   }
 
@@ -232,6 +238,10 @@ class DataspectsMediaWikiFeed {
       "categories" => $this->categories,
       "sections" => $this->sections,
       "annotations" => $this->annotations,
+      "templates" => $this->templates,
+      "outgoingLinks" => $this->outgoingLinks,
+      "incomingLinks" => $this->incomingLinks,
+      "images" => $this->images,
       "ds0__indexingJob" => $GLOBALS['wgDS0IndexingJob'],
     );
     return json_encode($mediaWikiPage);
