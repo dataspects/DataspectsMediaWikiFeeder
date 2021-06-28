@@ -65,7 +65,9 @@ class DataspectsMediaWikiFeed {
     switch($this->title->mNamespace) {
       case 0:
         $this->getCategories();
-        $this->getWikitext();
+	$this->getWikitext();
+	$this->getSections();
+	print_r($this->sections);
         $this->parsedWikitext = $this->getParsedWikitext($this->wikitext);
         $this->getMediaWikiPageAnnotations();
         $this->getIncomingAndOutgoingLinks();
@@ -135,6 +137,26 @@ class DataspectsMediaWikiFeed {
     $parsedWikitext = $parser->parse($wikitext, $this->title, $parserOptions);
     if($parsedWikitext->mText) {
       return $parsedWikitext->mText;
+    }
+  }
+
+  private function getSections() {
+    $params = new \FauxRequest(
+      array(
+        'action' => 'parse',
+        'page' => $this->title,
+        "prop" => "wikitext|text|categories|templates|links|externallinks|sections|properties",
+        "disablelimitreport" => "yes",
+        "disableeditsection" => "yes",
+      )
+    );
+    $api = new \ApiMain( $params );
+    $api->execute();
+    $data = $api->getResult()->getResultData();
+    foreach($data["parse"]["sections"] as $i => $section) {
+	if(is_numeric($i)) {
+	    	$this->sections[] = $section;
+	}
     }
   }
 
@@ -208,6 +230,7 @@ class DataspectsMediaWikiFeed {
       "mw0__wikiText" => trim($this->wikitext),
       "mw0__html" => trim($this->parsedWikitext),
       "categories" => $this->categories,
+      "sections" => $this->sections,
       "annotations" => $this->annotations,
       "ds0__indexingJob" => $GLOBALS['wgDS0IndexingJob'],
     );
