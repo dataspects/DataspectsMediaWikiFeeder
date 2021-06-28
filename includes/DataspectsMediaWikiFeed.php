@@ -5,7 +5,8 @@ namespace MediaWiki\Extension\DataspectsMediaWikiFeeder;
 class DataspectsMediaWikiFeed {
 
   public function __construct(\Title $title) {
-    $this->title = $title;
+	  $this->title = $title;
+	  $this->fullArticlePath = $GLOBALS['wgServer'].str_replace("$1", "", $GLOBALS['wgArticlePath']);
   }
 
   static function deleteFromDatastore($id) {
@@ -181,9 +182,13 @@ class DataspectsMediaWikiFeed {
       if(is_array($property)) {
         $propertyName = $property['property'];
         if($propertyName[0] != '_') {
-          foreach($property['dataitem'] as $object) {
-	          if(is_array($object)) {
-              $source = str_replace('#0##', '', $object['item']);
+		foreach($property['dataitem'] as $object) {
+			if(is_array($object)) {
+			$source = str_replace('#0##', '', $object['item']);
+			$smwLiteral = $source;
+			  if($object['type'] == 9) {
+				$source = $this->fullArticlePath.$source;
+			  }
               $this->annotations[] = array(
                 'subject' => $this->title->getFullURL(),
                 'predicate' => $propertyName,
