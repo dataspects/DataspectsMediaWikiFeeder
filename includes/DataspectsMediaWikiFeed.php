@@ -190,7 +190,7 @@ class DataspectsMediaWikiFeed {
 				$source = $this->fullArticlePath.$source;
 			  }
               $this->annotations[] = array(
-                'subject' => $this->title->getFullURL(),
+                'subject' => strtolower($this->title->getFullURL()),
                 'predicate' => $propertyName,
                 'objectLiteral' => $source,
                 'objectLiteralHTML' => $this->getParsedWikitext($source),
