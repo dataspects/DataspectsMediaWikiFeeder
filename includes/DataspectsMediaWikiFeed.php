@@ -230,7 +230,6 @@ class DataspectsMediaWikiFeed {
   }
 
   # LEX200122141600
-
   private function getMediaWikiPage() {
     $mediaWikiPage = array(
       "mw0__pageID" => $this->title->mArticleID,
@@ -250,6 +249,7 @@ class DataspectsMediaWikiFeed {
       "incomingLinks" => $this->incomingLinks,
       "images" => $this->images,
       "ds0__indexingJob" => $GLOBALS['wgDS0IndexingJob'],
+      "ds0__defaultPredicateNamespace" => $GLOBALS['wgDS0DefaultPredicateNamespace'],
     );
     return json_encode($mediaWikiPage);
   }
