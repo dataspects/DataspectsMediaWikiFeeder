@@ -117,7 +117,7 @@ class DataspectsMediaWikiFeed {
     $this->categories = array();
     $categories = $this->wikiPage->getCategories();
     foreach($categories as $category) {
-      $this->categories[] = $category->mTextform;
+      $this->categories[] = $this->fullArticlePath.$category->mTextform;
     }
   }
 
